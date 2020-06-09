@@ -48,10 +48,15 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 
 	float t, b, l, r;
 
+	
+
 	t = zNear * tan(eye_f / 2);
 	b = -t;
 	r = t * aspect_ratio;
 	l = -r;
+
+	//-Z axis 
+	zNear = -zNear; zFar = -zFar;
 
 	Eigen::Matrix4f Mper2ortho;
 	Eigen::Matrix4f m1;

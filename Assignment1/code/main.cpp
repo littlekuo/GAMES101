@@ -43,12 +43,8 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 
     Eigen::Matrix4f projection = Eigen::Matrix4f::Identity();
 
-    
 	float eye_f = eye_fov * MY_PI / 180;
-
-	float t, b, l, r;
-
-	
+	float t, b, l, r, n, f;
 
 	t = zNear * tan(eye_f / 2);
 	b = -t;
@@ -56,15 +52,26 @@ Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio,
 	l = -r;
 
 	//-Z axis 
-	zNear = -zNear; zFar = -zFar;
+	n = -zNear; f = -zFar;
 
 	Eigen::Matrix4f Mper2ortho;
 	Eigen::Matrix4f m1;
 	Eigen::Matrix4f m2;
 
-	Mper2ortho << zNear, 0, 0, 0, 0, zNear, 0, 0, 0, 0, zNear + zFar, -zNear * zFar, 0, 0, 1, 0;
-    m1 << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -(zNear + zFar) / 2, 0, 0, 0, 1;
-	m2 << 2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, 2 / (zNear - zFar), 0, 0, 0, 0, 1;
+	Mper2ortho << n, 0, 0, 0, 
+		          0, n, 0, 0, 
+		          0, 0, n + f, -n*f, 
+		          0, 0, 1, 0;
+
+    m1 << 1, 0, 0, 0, 
+		  0, 1, 0, 0, 
+		  0, 0, 1, -(n + f)/2.0, 
+		  0, 0, 0, 1;
+
+	m2 << 2/(r-l), 0, 0, 0, 
+		  0, 2/(t-b), 0, 0, 
+		  0, 0, 2/(n-f), 0, 
+		  0, 0, 0, 1;
 
 	projection = m2 * m1 * Mper2ortho;
     return projection;
